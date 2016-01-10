@@ -7,21 +7,20 @@ var mother = document.getElementById('mother');
 var s = new Seed('input');
 
 s.elementClick = function(){
-					var self = this;
-					// All the HTML element properties must be named capitalized and prefixed by the word "element" (without the quotes);
-					//if you want to use an attribute like data-something, name you property as elementData_something.
-					var inputText  = new Seed("input",
-											  { 
-											     elementType: "text",
-											     elementData_Test: "teste", 
-											     uselessProperty: "testing",
-											     elementClick:function(){this.value = inputText.uselessProperty;}, 
-											     elementClass:"form-control"
-											   });
-					inputText.render(mother);
-					setTimeout(function(){ self.setAttribute('class', "btn btn-primary"); }, 1000);
-					
-					};
+		var self = this;
+		// All the HTML element properties must be named capitalized and prefixed by the word "element" (without the quotes);
+		//if you want to use an attribute like data-something, name you property as elementData_something.
+		var inputText  = new Seed("input",
+								  { 
+								     elementType: "text",
+								     elementData_Test: "teste", 
+								     uselessProperty: "testing",
+								     elementClick:function(){this.value = inputText.uselessProperty;}, 
+								     elementClass:"form-control"
+								   });
+		inputText.render(mother);
+		setTimeout(function(){ self.setAttribute('class', "btn btn-primary"); }, 1000);
+		};
 s.elementValue = "Click Me!";
 //This method will be executed before rendering the element
 s.componentWillRender = function(){console.log('Here we go');}
