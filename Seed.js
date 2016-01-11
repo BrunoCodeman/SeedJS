@@ -2,33 +2,57 @@
 
 function Seed (elementName, props)
 {
-	props = props || {};
 	var self = this;
-	self.ownProps = ["componentWillRender", "componentDidRender", "render", 
-					 "buildComponent", "elementTagName", "addChild", "fatherElement"];
-
+	self.props = props || {};
+	self.ownProps = ["componentWillRender", "componentDidRender", "render", "props",
+					 "buildComponent", "elementTagName", "addChild", "component", "ownProps"];
 	self.component = document.createElement(elementName);
-	Object.keys(props).forEach(function(item){
-			self[item] = props[item];
-			});
 }
 
-Seed.prototype.appendChild = function(child){
-	this.component.appendChild(child);
+Seed.prototype.filterFields = function(){
+    var self = this;
+    Object.keys(self.props)
+          .filter(function(key){return typeof(self.props[key]) != "object" &&
+                                       typeof(self.props[key]) != "array";})
+          .filter(function(key){return self.ownProps.indexOf(key) < 0;})
+          .forEach(function(item){
+                    self[item] = self.props[item];
+                   });
+
+}
+
+Seed.prototype.appendChild = function(seedElement){
+    seedElement.render(this.component);
 }
 
 Seed.prototype.buildComponent = function(){
 	var self = this;
+	self.filterFields();
 	var keys = Object
 				.keys(self)
-				.filter(function(prop){return typeof(self[prop]) != "object" && typeof(self[prop]) != "array";})
-				.filter(function(prop){return self.ownProps.indexOf(prop) < 0;});
-	var i = keys.length;
+				.map(function(item){
+				    if(item.indexOf("element") > -1)
+				    {
+				        var newKey = item.replace("element","")
+				                .split("_")
+				                .join("-")
+				                .toLowerCase();
+
+				        self[newKey] = self[item];
+
+				        delete self[item];
+
+				        return newKey;
+				    }
+
+				}).filter(function(key){return key != null});
+    var i = keys.length;
 	while(i--)
 	{
 		var key = keys[i];
 		var propType = typeof(self[key]);
-		var propName = key.indexOf("element") > -1? key.replace("element","").split("_").join("-").toLowerCase() : null;
+		var propName = key;
+
 		if(propType == "function")
 		{
 			var f = self[key];
@@ -36,7 +60,7 @@ Seed.prototype.buildComponent = function(){
 		}
 		else
 		{
-			self.component.setAttribute(propName, self[key]);
+		    self.component.setAttribute(propName, self[key]);
 		}
 	}
 }
@@ -47,17 +71,16 @@ Seed.prototype.render = function(fatherElement)
 		var self = this;
 		var f = function(){};
 		self.buildComponent();
-		var willRender = typeof(self.componentWillRender) != "undefined"? self.componentWillRender: f;
-		var didRender = typeof(self.componentDidRender) != "undefined"? self.componentDidRender: f;
+		var willRender = typeof(self.componentWillRender) == "undefined"? f : self.componentWillRender;
+		var didRender = typeof(self.componentDidRender) == "undefined"? f : self.componentDidRender;
 		willRender();
 		if(fatherElement != null)
 		{
-			fatherElement.innertHTML = '';
-			fatherElement.appendChild(self.component);	
+			fatherElement.appendChild(self.component);
 		}
 		didRender();
 		return self.component;
-		
+
 	};
 
 Seed.prototype.constructor = Seed;
