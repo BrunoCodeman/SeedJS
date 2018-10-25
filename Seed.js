@@ -2,7 +2,7 @@
 
 function Seed (elementName, props)
 {
-	var self = this;
+	let self = this;
 	self.props = props || {};
 	self.ownProps = ["componentWillRender", "componentDidRender", "render", "props",
 					 "buildComponent", "elementTagName", "addChild", "component", "ownProps"];
@@ -10,7 +10,7 @@ function Seed (elementName, props)
 }
 
 Seed.prototype.filterFields = function(){
-    var self = this;
+    let self = this;
     Object.keys(self.props)
           .filter(function(key){return typeof(self.props[key]) != "object" &&
                                        typeof(self.props[key]) != "array";})
@@ -26,14 +26,14 @@ Seed.prototype.appendChild = function(seedElement){
 }
 
 Seed.prototype.buildComponent = function(){
-	var self = this;
+	let self = this;
 	self.filterFields();
-	var keys = Object
+	let keys = Object
 				.keys(self)
 				.map(function(item){
 				    if(item.indexOf("element") > -1)
 				    {
-				        var newKey = item.replace("element","")
+				        let newKey = item.replace("element","")
 				                .split("_")
 				                .join("-")
 				                .toLowerCase();
@@ -46,16 +46,16 @@ Seed.prototype.buildComponent = function(){
 				    }
 
 				}).filter(function(key){return key != null});
-    var i = keys.length;
+    let i = keys.length;
 	while(i--)
 	{
-		var key = keys[i];
-		var propType = typeof(self[key]);
-		var propName = key;
+		let key = keys[i];
+		let propType = typeof(self[key]);
+		let propName = key;
 
 		if(propType == "function")
 		{
-			var f = self[key];
+			let f = self[key];
 			self.component.addEventListener(propName, f);
 		}
 		else
@@ -68,11 +68,11 @@ Seed.prototype.buildComponent = function(){
 
 Seed.prototype.render = function(fatherElement)
 	{
-		var self = this;
-		var f = function(){};
+		let self = this;
+		let f = function(){};
 		self.buildComponent();
-		var willRender = typeof(self.componentWillRender) == "undefined"? f : self.componentWillRender;
-		var didRender = typeof(self.componentDidRender) == "undefined"? f : self.componentDidRender;
+		let willRender = typeof(self.componentWillRender) == "undefined"? f : self.componentWillRender;
+		let didRender = typeof(self.componentDidRender) == "undefined"? f : self.componentDidRender;
 		willRender();
 		if(fatherElement != null)
 		{
