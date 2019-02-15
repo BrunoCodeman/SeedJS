@@ -1,29 +1,36 @@
 'use strict';
 
-function Seed (elementName, props)
+/*
+/ Creates a new Seed object
+/ Parameters:
+/ - elementName: The name of the HTML element you want to create (input, div, etc)
+/ - attrs: The attributes of your element (style, value, etc)
+*/
+function Seed (elementName, attrs)
 {
 	let self = this;
-	self.props = props || {};
-	self.ownProps = ["componentWillRender", "componentDidRender", "render", "props",
+	self.attrs = attrs || {};
+	self.ownProps = ["componentWillRender", "componentDidRender", "render", "attrs",
 					 "buildComponent", "elementTagName", "addChild", "component", "ownProps"];
 	self.component = document.createElement(elementName);
 }
 
-Seed.prototype.filterFields = function(){
+/*
+Add the attributes to the element
+*/
+Seed.prototype.filterFields = function() {
     let self = this;
-    Object.keys(self.props)
-          .filter(function(key){return typeof(self.props[key]) != "object" &&
-                                       typeof(self.props[key]) != "array";})
-          .filter(function(key){return self.ownProps.indexOf(key) < 0;})
-          .forEach(function(item){
-                    self[item] = self.props[item];
-                   });
-
+    Object.keys(self.attrs)
+          .filter(function(key){return 	typeof(self.attrs[key]) != "object" &&
+                                       	typeof(self.attrs[key]) != "array" &&
+                                     		self.ownProps.indexOf(key) < 0;})
+          .forEach(function(item) { self[item] = self.attrs[item]; });
 }
 
-Seed.prototype.appendChild = function(seedElement){
-    seedElement.render(this.component);
-}
+/*
+ Appends and render a child component
+*/
+Seed.prototype.appendChild = function(seedElement) { seedElement.renderOn(this.component); }
 
 Seed.prototype.buildComponent = function(){
 	let self = this;
@@ -31,6 +38,7 @@ Seed.prototype.buildComponent = function(){
 	let keys = Object
 				.keys(self)
 				.map(function(item){
+
 				    if(item.indexOf("element") > -1)
 				    {
 				        let newKey = item.replace("element","")
@@ -46,7 +54,9 @@ Seed.prototype.buildComponent = function(){
 				    }
 
 				}).filter(function(key){return key != null});
-    let i = keys.length;
+
+	let i = keys.length;
+	
 	while(i--)
 	{
 		let key = keys[i];
@@ -65,8 +75,12 @@ Seed.prototype.buildComponent = function(){
 	}
 }
 
-
-Seed.prototype.render = function(fatherElement)
+/*
+/	Renders the component
+/ Parameters: 
+/ - fatherElement: element where your component must be rendered
+*/
+Seed.prototype.renderOn = function(fatherElement)
 	{
 		let self = this;
 		let f = function(){};
